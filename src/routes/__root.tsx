@@ -2,10 +2,9 @@ import { QueryClient } from "@tanstack/react-query";
 import {
   createRootRouteWithContext,
   Outlet,
-  useRouter,
+  useMatches,
 } from "@tanstack/react-router";
-import React, { Suspense } from "react";
-import { Helmet } from "react-helmet-async";
+import React, { Suspense, useEffect } from "react";
 
 const TanStackRouterDevtools =
   process.env.NODE_ENV === "production"
@@ -20,8 +19,8 @@ const TanStackRouterDevtools =
       );
 
 function RootComponent() {
-  const router = useRouter();
-  const matchWithTitle = [...router.state.matches]
+  const matches = useMatches();
+  const matchWithTitle = [...matches]
     .reverse()
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     .find((d) => (d.context as Record<string, any>)?.title);
@@ -30,12 +29,13 @@ function RootComponent() {
     (matchWithTitle?.context as Record<string, any>)?.title ||
     "Feather Starter";
 
+  useEffect(() => {
+    document.title = title;
+  }, [title]);
+
   return (
     <>
       <Outlet />
-      <Helmet>
-        <title>{title}</title>
-      </Helmet>
       <Suspense>
         <TanStackRouterDevtools />
       </Suspense>
